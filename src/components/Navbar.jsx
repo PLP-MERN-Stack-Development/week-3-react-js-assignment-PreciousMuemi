@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import Button from './Button';
 
-const Navbar = () => {
+const Navbar = ({ onMenuClick }) => {
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
 
@@ -12,8 +12,6 @@ const Navbar = () => {
     { path: '/teachers', label: 'Teachers' },
     { path: '/classes', label: 'Classes' },
     { path: '/attendance', label: 'Attendance' },
-    { path: '/api-students', label: 'API Students' },
-    { path: '/api-courses', label: 'API Courses' },
   ];
 
   return (
@@ -21,6 +19,13 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
+            <Button
+              onClick={onMenuClick}
+              variant="secondary"
+              className="lg:hidden mr-3 p-2"
+            >
+              Menu
+            </Button>
             <Link to="/" className="flex items-center space-x-2">
               <span className="text-xl font-bold text-gray-900 dark:text-white">
                 School Manager
@@ -52,7 +57,7 @@ const Navbar = () => {
               variant="secondary"
               className="p-2"
             >
-              {isDark ? '☀️' : '🌙'}
+              {isDark ? 'Light' : 'Dark'}
             </Button>
           </div>
         </div>
@@ -70,7 +75,6 @@ const Navbar = () => {
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
-                <span className="mr-2">{item.icon}</span>
                 {item.label}
               </Link>
             ))}

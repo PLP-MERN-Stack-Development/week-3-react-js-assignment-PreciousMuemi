@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import LoadingSpinner from '../components/LoadingSpinner';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useApi } from '../hooks/useApi';
 
 const Students = () => {
   const [students, setStudents] = useLocalStorage('students', []);
@@ -9,6 +11,12 @@ const Students = () => {
   const [editingStudent, setEditingStudent] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterGrade, setFilterGrade] = useState('all');
+  const [dataSource, setDataSource] = useState('local'); // 'local' or 'api'
+
+  // Fetch API data
+  const { data: apiStudents, loading: apiLoading, error: apiError } = useApi(
+    'https://jsonplaceholder.typicode.com/users'
+  );
 
   const [formData, setFormData] = useState({
     name: '',
@@ -20,6 +28,18 @@ const Students = () => {
   });
 
   const grades = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+
+  // Transform API data to match local format
+  const transformedApiStudents = apiStudents ? apiStudents.map(user => ({
+    id: `api-${user.id}`,
+    name: user.name,
+    email: user.email,
+    grade: Math.floor(Math.random() * 12) + 1, // Random grade for demo
+    age: Math.floor(Math.random() * 10) + 15, // Random age for demo
+    phone: user.phone,
+    address: `${user.address.street}, ${user.address.city}`,
+    isApiData: true
+  })) : [];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -66,10 +86,15 @@ const Students = () => {
     }
   };
 
-  const filteredStudents = students.filter(student => {
+  // Get current data source
+  const currentStudents = dataSource === 'api' ? transformedApiStudents : students;
+  const isLoading = dataSource === 'api' ? apiLoading : false;
+  const hasError = dataSource === 'api' ? apiError : null;
+
+  const filteredStudents = currentStudents.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          student.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesGrade = filterGrade === 'all' || student.grade === filterGrade;
+    const matchesGrade = filterGrade === 'all' || student.grade.toString() === filterGrade;
     return matchesSearch && matchesGrade;
   });
 
@@ -84,6 +109,36 @@ const Students = () => {
           Add New Student
         </Button>
       </div>
+
+      {/* Data Source Toggle */}
+      <Card className="p-6 mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Data Source
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Choose between local data and API data from JSONPlaceholder
+            </p>
+          </div>
+          <div className="flex space-x-2">
+            <Button
+              onClick={() => setDataSource('local')}
+              variant={dataSource === 'local' ? 'primary' : 'secondary'}
+              size="sm"
+            >
+              Local Data ({students.length})
+            </Button>
+            <Button
+              onClick={() => setDataSource('api')}
+              variant={dataSource === 'api' ? 'primary' : 'secondary'}
+              size="sm"
+            >
+              API Data ({transformedApiStudents.length})
+            </Button>
+          </div>
+        </div>
+      </Card>
 
       {/* Search and Filter */}
       <Card className="p-6 mb-6">
@@ -118,8 +173,32 @@ const Students = () => {
         </div>
       </Card>
 
+      {/* Loading State */}
+      {isLoading && <LoadingSpinner size="lg" color="blue" text="Loading students..." />}
+
+      {/* Error State */}
+      {hasError && (
+        <Card className="p-6 mb-6">
+          <div className="text-center py-8">
+            <div className="text-red-500 text-6xl mb-4">⚠️</div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Error Loading API Data
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              {hasError}
+            </p>
+            <Button 
+              onClick={() => setDataSource('local')} 
+              variant="primary"
+            >
+              Switch to Local Data
+            </Button>
+          </div>
+        </Card>
+      )}
+
       {/* Add/Edit Form */}
-      {showForm && (
+      {showForm && dataSource === 'local' && (
         <Card className="p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             {editingStudent ? 'Edit Student' : 'Add New Student'}
@@ -228,7 +307,7 @@ const Students = () => {
       {/* Students List */}
       <Card className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-          Students ({filteredStudents.length})
+          Students ({filteredStudents.length}) - {dataSource === 'api' ? 'API Data' : 'Local Data'}
         </h2>
         {filteredStudents.length > 0 ? (
           <div className="overflow-x-auto">
@@ -262,6 +341,11 @@ const Students = () => {
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {student.name}
+                            {student.isApiData && (
+                              <span className="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                API
+                              </span>
+                            )}
                           </div>
                           <div className="text-sm text-gray-500 dark:text-gray-400">
                             {student.email}
@@ -278,22 +362,27 @@ const Students = () => {
                       {student.phone || 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
-                        <Button
-                          onClick={() => handleEdit(student)}
-                          variant="secondary"
-                          className="text-xs px-2 py-1"
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          onClick={() => handleDelete(student.id)}
-                          variant="danger"
-                          className="text-xs px-2 py-1"
-                        >
-                          Delete
-                        </Button>
-                      </div>
+                      {!student.isApiData && (
+                        <div className="flex space-x-2">
+                          <Button
+                            onClick={() => handleEdit(student)}
+                            variant="secondary"
+                            className="text-xs px-2 py-1"
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            onClick={() => handleDelete(student.id)}
+                            variant="danger"
+                            className="text-xs px-2 py-1"
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      )}
+                      {student.isApiData && (
+                        <span className="text-gray-400 text-xs">Read-only</span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -303,7 +392,7 @@ const Students = () => {
         ) : (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">
-              {students.length === 0 ? 'No students added yet.' : 'No students match your search criteria.'}
+              {currentStudents.length === 0 ? 'No students found.' : 'No students match your search criteria.'}
             </p>
           </div>
         )}

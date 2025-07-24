@@ -12,21 +12,18 @@ const Dashboard = () => {
     {
       title: 'Total Students',
       value: students.length,
-      icon: '👨‍🎓',
       color: 'text-blue-600',
       bgColor: 'bg-blue-100 dark:bg-blue-900/20'
     },
     {
       title: 'Total Teachers',
       value: teachers.length,
-      icon: '👨‍🏫',
       color: 'text-green-600',
       bgColor: 'bg-green-100 dark:bg-green-900/20'
     },
     {
       title: 'Active Classes',
       value: classes.length,
-      icon: '📚',
       color: 'text-purple-600',
       bgColor: 'bg-purple-100 dark:bg-purple-900/20'
     },
@@ -36,19 +33,16 @@ const Dashboard = () => {
         const today = new Date().toDateString();
         return new Date(a.date).toDateString() === today;
       }).length,
-      icon: '📋',
       color: 'text-orange-600',
       bgColor: 'bg-orange-100 dark:bg-orange-900/20'
     }
   ];
 
   const quickActions = [
-    { title: 'Add New Student', icon: '➕', path: '/students', color: 'bg-blue-500 hover:bg-blue-600' },
-    { title: 'Add New Teacher', icon: '👨‍🏫', path: '/teachers', color: 'bg-green-500 hover:bg-green-600' },
-    { title: 'Create Class', icon: '📚', path: '/classes', color: 'bg-purple-500 hover:bg-purple-600' },
-    { title: 'Take Attendance', icon: '📋', path: '/attendance', color: 'bg-orange-500 hover:bg-orange-600' },
-    { title: 'API Students', icon: '🌐', path: '/api-students', color: 'bg-indigo-500 hover:bg-indigo-600' },
-    { title: 'API Courses', icon: '📖', path: '/api-courses', color: 'bg-pink-500 hover:bg-pink-600' }
+    { title: 'Add New Student', path: '/students', color: 'bg-blue-500 hover:bg-blue-600' },
+    { title: 'Add New Teacher', path: '/teachers', color: 'bg-green-500 hover:bg-green-600' },
+    { title: 'Create Class', path: '/classes', color: 'bg-purple-500 hover:bg-purple-600' },
+    { title: 'Take Attendance', path: '/attendance', color: 'bg-orange-500 hover:bg-orange-600' }
   ];
 
   return (
@@ -88,14 +82,13 @@ const Dashboard = () => {
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Quick Actions
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {quickActions.map((action, index) => (
             <button
               key={index}
               className={`${action.color} text-white p-4 rounded-lg transition-colors duration-200 flex flex-col items-center space-y-2`}
               onClick={() => window.location.href = action.path}
             >
-              <span className="text-2xl">{action.icon}</span>
               <span className="font-medium">{action.title}</span>
             </button>
           ))}

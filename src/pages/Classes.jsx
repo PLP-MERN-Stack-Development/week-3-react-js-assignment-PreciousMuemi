@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import LoadingSpinner from '../components/LoadingSpinner';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useApi } from '../hooks/useApi';
 
 const Classes = () => {
   const [classes, setClasses] = useLocalStorage('classes', []);
@@ -9,6 +11,12 @@ const Classes = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingClass, setEditingClass] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [dataSource, setDataSource] = useState('local'); // 'local' or 'api'
+
+  // Fetch API data
+  const { data: apiPosts, loading: apiLoading, error: apiError } = useApi(
+    'https://jsonplaceholder.typicode.com/posts'
+  );
 
   const [formData, setFormData] = useState({
     name: '',
@@ -33,6 +41,20 @@ const Classes = () => {
     '11:00 AM - 12:00 PM', '12:00 PM - 1:00 PM', '1:00 PM - 2:00 PM',
     '2:00 PM - 3:00 PM', '3:00 PM - 4:00 PM', '4:00 PM - 5:00 PM'
   ];
+
+  // Transform API data to match local format
+  const transformedApiClasses = apiPosts ? apiPosts.slice(0, 20).map(post => ({
+    id: `api-${post.id}`,
+    name: post.title,
+    subject: subjects[Math.floor(Math.random() * subjects.length)],
+    teacherId: `api-teacher-${post.userId}`,
+    grade: Math.floor(Math.random() * 12) + 1,
+    schedule: timeSlots[Math.floor(Math.random() * timeSlots.length)],
+    room: `Room ${Math.floor(Math.random() * 20) + 1}`,
+    capacity: Math.floor(Math.random() * 30) + 15,
+    description: post.body,
+    isApiData: true
+  })) : [];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -81,12 +103,20 @@ const Classes = () => {
     }
   };
 
-  const filteredClasses = classes.filter(cls => {
+  // Get current data source
+  const currentClasses = dataSource === 'api' ? transformedApiClasses : classes;
+  const isLoading = dataSource === 'api' ? apiLoading : false;
+  const hasError = dataSource === 'api' ? apiError : null;
+
+  const filteredClasses = currentClasses.filter(cls => {
     return cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
            cls.subject.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
   const getTeacherName = (teacherId) => {
+    if (teacherId.startsWith('api-teacher-')) {
+      return `API Teacher ${teacherId.split('-')[2]}`;
+    }
     const teacher = teachers.find(t => t.id === teacherId);
     return teacher ? teacher.name : 'Not Assigned';
   };
@@ -102,6 +132,36 @@ const Classes = () => {
           Create New Class
         </Button>
       </div>
+
+      {/* Data Source Toggle */}
+      <Card className="p-6 mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Data Source
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Choose between local data and API data from JSONPlaceholder
+            </p>
+          </div>
+          <div className="flex space-x-2">
+            <Button
+              onClick={() => setDataSource('local')}
+              variant={dataSource === 'local' ? 'primary' : 'secondary'}
+              size="sm"
+            >
+              Local Data ({classes.length})
+            </Button>
+            <Button
+              onClick={() => setDataSource('api')}
+              variant={dataSource === 'api' ? 'primary' : 'secondary'}
+              size="sm"
+            >
+              API Data ({transformedApiClasses.length})
+            </Button>
+          </div>
+        </div>
+      </Card>
 
       {/* Search */}
       <Card className="p-6 mb-6">
@@ -119,8 +179,32 @@ const Classes = () => {
         </div>
       </Card>
 
+      {/* Loading State */}
+      {isLoading && <LoadingSpinner size="lg" color="purple" text="Loading classes..." />}
+
+      {/* Error State */}
+      {hasError && (
+        <Card className="p-6 mb-6">
+          <div className="text-center py-8">
+            <div className="text-red-500 text-6xl mb-4">⚠️</div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Error Loading API Data
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              {hasError}
+            </p>
+            <Button 
+              onClick={() => setDataSource('local')} 
+              variant="primary"
+            >
+              Switch to Local Data
+            </Button>
+          </div>
+        </Card>
+      )}
+
       {/* Add/Edit Form */}
-      {showForm && (
+      {showForm && dataSource === 'local' && (
         <Card className="p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             {editingClass ? 'Edit Class' : 'Create New Class'}
@@ -269,7 +353,7 @@ const Classes = () => {
       {/* Classes List */}
       <Card className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-          Classes ({filteredClasses.length})
+          Classes ({filteredClasses.length}) - {dataSource === 'api' ? 'API Data' : 'Local Data'}
         </h2>
         {filteredClasses.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -279,6 +363,11 @@ const Classes = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {cls.name}
+                      {cls.isApiData && (
+                        <span className="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                          API
+                        </span>
+                      )}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {cls.subject}
@@ -313,34 +402,41 @@ const Classes = () => {
                 </div>
                 
                 {cls.description && (
-                  <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                  <p className="mt-3 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
                     {cls.description}
                   </p>
                 )}
                 
-                <div className="mt-4 flex space-x-2">
-                  <Button
-                    onClick={() => handleEdit(cls)}
-                    variant="secondary"
-                    className="text-xs px-2 py-1"
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    onClick={() => handleDelete(cls.id)}
-                    variant="danger"
-                    className="text-xs px-2 py-1"
-                  >
-                    Delete
-                  </Button>
-                </div>
+                {!cls.isApiData && (
+                  <div className="mt-4 flex space-x-2">
+                    <Button
+                      onClick={() => handleEdit(cls)}
+                      variant="secondary"
+                      className="text-xs px-2 py-1"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      onClick={() => handleDelete(cls.id)}
+                      variant="danger"
+                      className="text-xs px-2 py-1"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                )}
+                {cls.isApiData && (
+                  <div className="mt-4">
+                    <span className="text-gray-400 text-xs">Read-only</span>
+                  </div>
+                )}
               </Card>
             ))}
           </div>
         ) : (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">
-              {classes.length === 0 ? 'No classes created yet.' : 'No classes match your search criteria.'}
+              {currentClasses.length === 0 ? 'No classes found.' : 'No classes match your search criteria.'}
             </p>
           </div>
         )}
