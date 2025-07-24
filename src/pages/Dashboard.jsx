@@ -46,7 +46,9 @@ const Dashboard = () => {
     { title: 'Add New Student', icon: '➕', path: '/students', color: 'bg-blue-500 hover:bg-blue-600' },
     { title: 'Add New Teacher', icon: '👨‍🏫', path: '/teachers', color: 'bg-green-500 hover:bg-green-600' },
     { title: 'Create Class', icon: '📚', path: '/classes', color: 'bg-purple-500 hover:bg-purple-600' },
-    { title: 'Take Attendance', icon: '📋', path: '/attendance', color: 'bg-orange-500 hover:bg-orange-600' }
+    { title: 'Take Attendance', icon: '📋', path: '/attendance', color: 'bg-orange-500 hover:bg-orange-600' },
+    { title: 'API Students', icon: '🌐', path: '/api-students', color: 'bg-indigo-500 hover:bg-indigo-600' },
+    { title: 'API Courses', icon: '📖', path: '/api-courses', color: 'bg-pink-500 hover:bg-pink-600' }
   ];
 
   return (
@@ -86,7 +88,7 @@ const Dashboard = () => {
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Quick Actions
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {quickActions.map((action, index) => (
             <button
               key={index}

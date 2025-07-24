@@ -7,11 +7,13 @@ const Navbar = () => {
   const location = useLocation();
 
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: '📊' },
-    { path: '/students', label: 'Students', icon: '👨‍🎓' },
-    { path: '/teachers', label: 'Teachers', icon: '👨‍🏫' },
-    { path: '/classes', label: 'Classes', icon: '📚' },
-    { path: '/attendance', label: 'Attendance', icon: '📋' },
+    { path: '/', label: 'Dashboard' },
+    { path: '/students', label: 'Students' },
+    { path: '/teachers', label: 'Teachers' },
+    { path: '/classes', label: 'Classes' },
+    { path: '/attendance', label: 'Attendance' },
+    { path: '/api-students', label: 'API Students' },
+    { path: '/api-courses', label: 'API Courses' },
   ];
 
   return (
@@ -20,7 +22,6 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <span className="text-2xl">🏫</span>
               <span className="text-xl font-bold text-gray-900 dark:text-white">
                 School Manager
               </span>
@@ -39,7 +40,6 @@ const Navbar = () => {
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
-                  <span className="mr-1">{item.icon}</span>
                   {item.label}
                 </Link>
               ))}
