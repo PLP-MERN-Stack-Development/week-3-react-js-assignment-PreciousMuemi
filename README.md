@@ -244,7 +244,7 @@ A comprehensive React-based school management system with API integration, built
 
 ### Live Demo
 
-**Deployed Project URL:** [Add your deployed project URL here]
+**Deployed Project URL:** [https://plp-mern-stack-development.github.io/week-3-react-js-assignment-PreciousMuemi/]
 
 ### Deployment Options
 
