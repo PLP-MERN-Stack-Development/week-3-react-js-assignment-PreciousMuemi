@@ -1,45 +1,49 @@
-# 🏫 School Management System
+# School Management System
 
 A comprehensive React-based school management system with API integration, built using React, Tailwind CSS, and modern web technologies.
 
-## ✨ Features
+##  Features
 
-### 📊 Dashboard
+###  Dashboard
 
 - Overview statistics (students, teachers, classes, attendance)
 - Quick action buttons for all major functions
 - Recent students and teachers display
 - Responsive design with dark/light mode
+- **Data Source Toggle**: Switch between local and API data
 
-### 👨‍🎓 Student Management
+###  Student Management
 
 - Add, edit, and delete student records
 - Search and filter students by name, email, or grade
 - Comprehensive student information (name, email, grade, age, phone, address)
 - Local storage persistence
+- **API Integration**: Fetch and display students from JSONPlaceholder
+- **Toggle Switch**: Modern sliding switch for data source selection
 
-### 👨‍🏫 Teacher Management
+###  Teacher Management
 
 - Add, edit, and delete teacher records
 - Search and filter teachers by name, email, or subject
 - Teacher details including experience and qualifications
 - Subject assignment tracking
 
-### 📚 Class Management
+###  Class Management
 
 - Create and manage class schedules
 - Assign teachers to classes
 - Set class capacity and room numbers
 - Grade-based student grouping
+- **English Course Names**: Proper course titles instead of Lorem ipsum
+- **API Integration**: Fetch courses with realistic descriptions
 
-### 📋 Attendance Tracking
+### Attendance Tracking
 
 - Take daily attendance for classes
 - Present/absent status with notes
 - Attendance statistics and history
 - Date-based attendance records
-
-### 🌐 API Integration
+###  API Integration
 
 - **API Students**: Fetch student data from JSONPlaceholder API
 - **API Courses**: Fetch course data from JSONPlaceholder API
@@ -47,16 +51,20 @@ A comprehensive React-based school management system with API integration, built
 - Pagination support
 - Search functionality for API data
 - Responsive grid layouts
+- **Toggle Switches**: Modern UI for switching between local and API data
 
-### 🎨 UI/UX Features
+###  UI/UX Features
 
-- **Dark/Light Mode**: Toggle between themes
+- **Dark/Light Mode**: Toggle between themes with smooth transitions
 - **Responsive Design**: Works on mobile, tablet, and desktop
 - **Animations**: Smooth transitions and loading effects
 - **Error Boundaries**: Graceful error handling
 - **Loading States**: Professional loading indicators
+- **Enhanced Sidebar**: Collapsible sidebar with icons and active states
+- **Sticky Header**: Navigation that stays at the top
+- **Mobile-First**: Optimized for all screen sizes
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -94,14 +102,16 @@ A comprehensive React-based school management system with API integration, built
 - View system overview and statistics
 - Access quick actions for all features
 - See recent students and teachers
+- **Toggle between local and API data** using the modern switch
 
 ### Managing Students
 
 1. Navigate to "Students" page
-2. Click "Add New Student" to create a new record
-3. Fill in student details (name, email, grade, etc.)
-4. Use search to find specific students
-5. Edit or delete existing records
+2. **Use the toggle switch** to choose between local and API data
+3. Click "Add New Student" to create a new record (local data only)
+4. Fill in student details (name, email, grade, etc.)
+5. Use search to find specific students
+6. Edit or delete existing records (local data only)
 
 ### Managing Teachers
 
@@ -113,9 +123,11 @@ A comprehensive React-based school management system with API integration, built
 ### Creating Classes
 
 1. Visit "Classes" page
-2. Create new classes with schedules
-3. Assign teachers to classes
-4. Set room numbers and capacity
+2. **Toggle between local and API data** to see different course information
+3. Create new classes with schedules (local data only)
+4. Assign teachers to classes
+5. Set room numbers and capacity
+6. **View realistic course names** like "Introduction to Computer Science" instead of Lorem ipsum
 
 ### Taking Attendance
 
@@ -125,22 +137,15 @@ A comprehensive React-based school management system with API integration, built
 4. Add notes if needed
 5. Save attendance records
 
-### API Data
+### API Data Features
 
-1. **API Students**: View students fetched from JSONPlaceholder
+- **Modern Toggle Switches**: Sliding switches instead of buttons
+- **Realistic Data**: English course names and descriptions
+- **Responsive Grids**: Beautiful card layouts
+- **Loading States**: Professional spinners and progress indicators
+- **Error Handling**: Graceful error messages with retry options
 
-   - Navigate to "API Students" page
-   - Browse through paginated results
-   - Search by name, email, or username
-   - View detailed student information
-
-2. **API Courses**: View courses fetched from JSONPlaceholder
-   - Go to "API Courses" page
-   - Browse course listings
-   - Search by title or description
-   - View course details
-
-## 🛠️ Technical Details
+## Technical Details
 
 ### Built With
 
@@ -157,14 +162,17 @@ A comprehensive React-based school management system with API integration, built
 - **useApi**: Custom hook for API calls
 - **ErrorBoundary**: Error handling component
 - **LoadingSpinner**: Reusable loading component
+- **ToggleSwitch**: Modern sliding switch component
+- **Enhanced Sidebar**: Collapsible navigation with icons
 
 ### API Integration
 
 - **JSONPlaceholder Users**: Simulates student data
-- **JSONPlaceholder Posts**: Simulates course data
+- **JSONPlaceholder Posts**: Simulates course data with English names
 - **Pagination**: Page-based data loading
 - **Search**: Client-side filtering
 - **Error Handling**: Graceful API error management
+- **Data Transformation**: Convert API data to realistic school information
 
 ### Responsive Design
 
@@ -172,8 +180,9 @@ A comprehensive React-based school management system with API integration, built
 - Breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px)
 - Flexible grid layouts
 - Touch-friendly interfaces
+- **Enhanced Mobile Navigation**: Hamburger menu with smooth animations
 
-## 🎯 Features Implemented
+##  Features Implemented
 
 ### ✅ Task 1: Project Setup
 
@@ -190,6 +199,8 @@ A comprehensive React-based school management system with API integration, built
 - ✅ Footer component with links
 - ✅ Layout component with Navbar and Footer
 - ✅ Customizable and reusable components
+- ✅ **Enhanced Sidebar** with icons and active states
+- ✅ **ToggleSwitch** component for modern UI
 
 ### ✅ Task 3: State Management and Hooks
 
@@ -198,6 +209,7 @@ A comprehensive React-based school management system with API integration, built
 - ✅ useEffect for side effects
 - ✅ useContext for theme management
 - ✅ Custom useLocalStorage hook
+- ✅ Custom useApi hook for API calls
 
 ### ✅ Task 4: API Integration
 
@@ -206,6 +218,8 @@ A comprehensive React-based school management system with API integration, built
 - ✅ Loading and error states
 - ✅ Pagination implementation
 - ✅ Search functionality for API results
+- ✅ **Data transformation** for realistic school data
+- ✅ **Toggle switches** for data source selection
 
 ### ✅ Task 5: Styling with Tailwind CSS
 
@@ -213,20 +227,46 @@ A comprehensive React-based school management system with API integration, built
 - ✅ Theme switcher (light/dark mode)
 - ✅ Tailwind utility classes throughout
 - ✅ Custom animations and transitions
+- ✅ **Enhanced mobile responsiveness**
+- ✅ **Modern UI components** with smooth animations
 
-## 📸 Screenshots
+##  Screenshots
 
-_Add screenshots of your application here_
+### Dashboard View
 
-## 🌐 Deployment
+![Dashboard Screenshot](<./public/Screenshot%20(163).png>)
+
+### Students Page with Toggle Switch
+
+![Students Page Screenshot](<./public/Screenshot%20(164).png>)
+
+## 🌐Deployment
+
+### Live Demo
+
+**Deployed Project URL:** [Add your deployed project URL here]
+
+### Deployment Options
 
 The application can be deployed to:
 
-- **Vercel**: `npm run build` then deploy to Vercel
+- **Vercel**:
+  ```bash
+  npm run build
+  # Then deploy to Vercel
+  ```
 - **Netlify**: Build and deploy to Netlify
 - **GitHub Pages**: Use GitHub Actions for deployment
 
-## 🤝 Contributing
+### Build for Production
+
+```bash
+npm run build
+```
+
+The built files will be in the `dist` folder, ready for deployment.
+
+##  Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -238,9 +278,3 @@ The application can be deployed to:
 
 This project is licensed under the MIT License.
 
-## 🙏 Acknowledgments
-
-- JSONPlaceholder for providing mock API data
-- Tailwind CSS for the amazing utility framework
-- React team for the excellent framework
-- Vite for the fast build tool
