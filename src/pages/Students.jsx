@@ -1,9 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useApi } from '../hooks/useApi';
+
+const ToggleSwitch = ({ checked, onChange, leftLabel, rightLabel }) => (
+  <div className="flex items-center space-x-2">
+    <span className="text-sm text-gray-700 dark:text-gray-300">{leftLabel}</span>
+    <button
+      type="button"
+      className={`relative inline-flex h-6 w-12 border-2 border-transparent rounded-full cursor-pointer transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${checked ? 'bg-blue-600' : 'bg-gray-300'}`}
+      aria-pressed={checked}
+      onClick={() => onChange(!checked)}
+    >
+      <span
+        className={`inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition-transform duration-200 ${checked ? 'translate-x-6' : 'translate-x-1'}`}
+      />
+    </button>
+    <span className="text-sm text-gray-700 dark:text-gray-300">{rightLabel}</span>
+  </div>
+);
 
 const Students = () => {
   const [students, setStudents] = useLocalStorage('students', []);
@@ -11,7 +28,7 @@ const Students = () => {
   const [editingStudent, setEditingStudent] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterGrade, setFilterGrade] = useState('all');
-  const [dataSource, setDataSource] = useState('local'); // 'local' or 'api'
+  const [useApiData, setUseApiData] = useState(false); // toggle for data source
 
   // Fetch API data
   const { data: apiStudents, loading: apiLoading, error: apiError } = useApi(
@@ -87,9 +104,9 @@ const Students = () => {
   };
 
   // Get current data source
-  const currentStudents = dataSource === 'api' ? transformedApiStudents : students;
-  const isLoading = dataSource === 'api' ? apiLoading : false;
-  const hasError = dataSource === 'api' ? apiError : null;
+  const currentStudents = useApiData ? transformedApiStudents : students;
+  const isLoading = useApiData ? apiLoading : false;
+  const hasError = useApiData ? apiError : null;
 
   const filteredStudents = currentStudents.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -121,22 +138,12 @@ const Students = () => {
               Choose between local data and API data from JSONPlaceholder
             </p>
           </div>
-          <div className="flex space-x-2">
-            <Button
-              onClick={() => setDataSource('local')}
-              variant={dataSource === 'local' ? 'primary' : 'secondary'}
-              size="sm"
-            >
-              Local Data ({students.length})
-            </Button>
-            <Button
-              onClick={() => setDataSource('api')}
-              variant={dataSource === 'api' ? 'primary' : 'secondary'}
-              size="sm"
-            >
-              API Data ({transformedApiStudents.length})
-            </Button>
-          </div>
+          <ToggleSwitch
+            checked={useApiData}
+            onChange={setUseApiData}
+            leftLabel="Local"
+            rightLabel="API"
+          />
         </div>
       </Card>
 
@@ -188,7 +195,7 @@ const Students = () => {
               {hasError}
             </p>
             <Button 
-              onClick={() => setDataSource('local')} 
+              onClick={() => setUseApiData(false)} 
               variant="primary"
             >
               Switch to Local Data
@@ -198,7 +205,7 @@ const Students = () => {
       )}
 
       {/* Add/Edit Form */}
-      {showForm && dataSource === 'local' && (
+      {showForm && !useApiData && (
         <Card className="p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             {editingStudent ? 'Edit Student' : 'Add New Student'}
@@ -307,7 +314,7 @@ const Students = () => {
       {/* Students Grid */}
       <Card className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-          Students ({filteredStudents.length}) - {dataSource === 'api' ? 'API Data' : 'Local Data'}
+          Students ({filteredStudents.length}) - {useApiData ? 'API Data' : 'Local Data'}
         </h2>
         {filteredStudents.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -324,11 +331,6 @@ const Students = () => {
                       <p className="font-medium text-gray-900 dark:text-white text-sm">
                         {student.name}
                       </p>
-                      {student.isApiData && (
-                        <span className="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                          API
-                        </span>
-                      )}
                     </div>
                     <p className="text-xs text-gray-600 dark:text-gray-400">{student.email}</p>
                   </div>

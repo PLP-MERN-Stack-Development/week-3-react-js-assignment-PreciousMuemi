@@ -11,7 +11,7 @@ const Dashboard = () => {
 
   // Fetch API data
   const { data: apiStudents, loading: studentsLoading } = useApi('https://jsonplaceholder.typicode.com/users');
-  const { data: apiPosts, loading: postsLoading } = useApi('https://jsonplaceholder.typicode.com/posts');
+  const { data: apiCourses, loading: coursesLoading } = useApi('https://jsonplaceholder.typicode.com/posts');
 
   const stats = [
     {
@@ -138,30 +138,30 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* API Posts Grid */}
+      {/* Courses Grid */}
       <div className="mt-6">
         <Card className="p-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            API Posts Data
+            Courses
           </h2>
-          {postsLoading ? (
+          {coursesLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">Loading posts...</p>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">Loading courses...</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {apiPosts?.slice(0, 12).map((post) => (
-                <div key={post.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              {apiCourses?.slice(0, 12).map((course) => (
+                <div key={course.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <h3 className="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2">
-                    {post.title}
+                    {course.title}
                   </h3>
                   <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-3 mb-3">
-                    {post.body}
+                    {course.body}
                   </p>
                   <div className="text-xs text-gray-500 dark:text-gray-500">
-                    <p><span className="font-medium">User ID:</span> {post.userId}</p>
-                    <p><span className="font-medium">Post ID:</span> {post.id}</p>
+                    <p><span className="font-medium">Course ID:</span> {course.id}</p>
+                    <p><span className="font-medium">Instructor ID:</span> {course.userId}</p>
                   </div>
                 </div>
               ))}
