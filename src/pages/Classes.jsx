@@ -1,17 +1,34 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useApi } from '../hooks/useApi';
 
+const ToggleSwitch = ({ checked, onChange, leftLabel, rightLabel }) => (
+  <div className="flex items-center space-x-2">
+    <span className="text-sm text-gray-700 dark:text-gray-300">{leftLabel}</span>
+    <button
+      type="button"
+      className={`relative inline-flex h-6 w-12 border-2 border-transparent rounded-full cursor-pointer transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 ${checked ? 'bg-purple-600' : 'bg-gray-300'}`}
+      aria-pressed={checked}
+      onClick={() => onChange(!checked)}
+    >
+      <span
+        className={`inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition-transform duration-200 ${checked ? 'translate-x-6' : 'translate-x-1'}`}
+      />
+    </button>
+    <span className="text-sm text-gray-700 dark:text-gray-300">{rightLabel}</span>
+  </div>
+);
+
 const Classes = () => {
   const [classes, setClasses] = useLocalStorage('classes', []);
-  const [teachers] = useLocalStorage('teachers', []);
   const [showForm, setShowForm] = useState(false);
   const [editingClass, setEditingClass] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [dataSource, setDataSource] = useState('local'); // 'local' or 'api'
+  const [filterSubject, setFilterSubject] = useState('all');
+  const [useApiData, setUseApiData] = useState(false);
 
   // Fetch API data
   const { data: apiPosts, loading: apiLoading, error: apiError } = useApi(
@@ -21,8 +38,7 @@ const Classes = () => {
   const [formData, setFormData] = useState({
     name: '',
     subject: '',
-    teacherId: '',
-    grade: '',
+    teacher: '',
     schedule: '',
     room: '',
     capacity: '',
@@ -32,35 +48,74 @@ const Classes = () => {
   const subjects = [
     'Mathematics', 'Science', 'English', 'History', 'Geography', 
     'Physics', 'Chemistry', 'Biology', 'Computer Science', 'Art',
-    'Music', 'Physical Education', 'Literature', 'Economics'
+    'Music', 'Physical Education', 'Literature', 'Economics', 'Psychology'
   ];
 
-  const grades = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
-  const timeSlots = [
-    '8:00 AM - 9:00 AM', '9:00 AM - 10:00 AM', '10:00 AM - 11:00 AM',
-    '11:00 AM - 12:00 PM', '12:00 PM - 1:00 PM', '1:00 PM - 2:00 PM',
-    '2:00 PM - 3:00 PM', '3:00 PM - 4:00 PM', '4:00 PM - 5:00 PM'
-  ];
+  // Transform API data to match local format with proper English course names
+  const transformedApiClasses = apiPosts ? apiPosts.map((post, index) => {
+    const courseNames = [
+      'Introduction to Computer Science',
+      'Advanced Mathematics',
+      'World History',
+      'English Literature',
+      'Physics Fundamentals',
+      'Chemistry Lab',
+      'Biology and Ecology',
+      'Art and Design',
+      'Music Theory',
+      'Physical Education',
+      'Economics Principles',
+      'Psychology Basics',
+      'Geography Studies',
+      'Creative Writing',
+      'Environmental Science',
+      'Digital Arts',
+      'Statistics and Data',
+      'Modern Literature',
+      'Chemistry Advanced',
+      'Biology Research'
+    ];
 
-  // Transform API data to match local format
-  const transformedApiClasses = apiPosts ? apiPosts.slice(0, 20).map(post => ({
-    id: `api-${post.id}`,
-    name: post.title,
-    subject: subjects[Math.floor(Math.random() * subjects.length)],
-    teacherId: `api-teacher-${post.userId}`,
-    grade: Math.floor(Math.random() * 12) + 1,
-    schedule: timeSlots[Math.floor(Math.random() * timeSlots.length)],
-    room: `Room ${Math.floor(Math.random() * 20) + 1}`,
-    capacity: Math.floor(Math.random() * 30) + 15,
-    description: post.body,
-    isApiData: true
-  })) : [];
+    const courseDescriptions = [
+      'Learn programming fundamentals and computer science principles. This course covers basic algorithms, data structures, and software development practices.',
+      'Advanced mathematical concepts including calculus, linear algebra, and mathematical analysis. Perfect for students pursuing STEM fields.',
+      'Comprehensive study of world history from ancient civilizations to modern times. Explore major events, cultures, and historical developments.',
+      'Study of classic and contemporary literature. Analyze themes, characters, and literary techniques across various genres and time periods.',
+      'Introduction to physics concepts including mechanics, thermodynamics, and electromagnetism. Hands-on experiments and problem-solving.',
+      'Laboratory-based chemistry course covering chemical reactions, molecular structures, and experimental techniques.',
+      'Study of living organisms and their interactions with the environment. Topics include genetics, evolution, and ecosystem dynamics.',
+      'Creative expression through various art forms and design principles. Develop artistic skills and aesthetic appreciation.',
+      'Fundamentals of music theory, composition, and performance. Learn to read music and understand musical concepts.',
+      'Physical fitness and sports education. Develop coordination, strength, and healthy lifestyle habits.',
+      'Introduction to economic principles and market dynamics. Study supply, demand, and economic systems.',
+      'Basic psychology concepts including human behavior, cognition, and mental processes. Understand the human mind.',
+      'Study of Earth\'s physical features, climates, and human geography. Explore different regions and cultures.',
+      'Develop writing skills through creative exercises and literary analysis. Express ideas through various writing styles.',
+      'Study of environmental systems and sustainability. Learn about ecosystems, climate change, and conservation.',
+      'Digital art creation using modern tools and techniques. Explore graphic design, animation, and digital media.',
+      'Statistical analysis and data interpretation. Learn to collect, analyze, and present data effectively.',
+      'Contemporary literature and modern storytelling techniques. Explore current trends in writing and publishing.',
+      'Advanced chemistry concepts and laboratory techniques. Deep dive into chemical processes and reactions.',
+      'Research methods in biology and scientific inquiry. Conduct experiments and analyze biological data.'
+    ];
+
+    return {
+      id: `api-${post.id}`,
+      name: courseNames[index % courseNames.length] || `Course ${post.id}`,
+      subject: subjects[index % subjects.length] || 'General Studies',
+      teacher: `Professor ${post.userId}`,
+      schedule: `Mon/Wed/Fri ${9 + (index % 8)}:00 AM`,
+      room: `Room ${100 + (index % 50)}`,
+      capacity: 25 + (index % 15),
+      description: courseDescriptions[index % courseDescriptions.length] || 'A comprehensive course covering essential topics and skills.',
+      isApiData: true
+    };
+  }) : [];
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
     if (editingClass) {
-      // Update existing class
       const updatedClasses = classes.map(cls => 
         cls.id === editingClass.id 
           ? { ...formData, id: cls.id }
@@ -69,7 +124,6 @@ const Classes = () => {
       setClasses(updatedClasses);
       setEditingClass(null);
     } else {
-      // Add new class
       const newClass = {
         ...formData,
         id: Date.now().toString(),
@@ -81,8 +135,7 @@ const Classes = () => {
     setFormData({
       name: '',
       subject: '',
-      teacherId: '',
-      grade: '',
+      teacher: '',
       schedule: '',
       room: '',
       capacity: '',
@@ -104,29 +157,24 @@ const Classes = () => {
   };
 
   // Get current data source
-  const currentClasses = dataSource === 'api' ? transformedApiClasses : classes;
-  const isLoading = dataSource === 'api' ? apiLoading : false;
-  const hasError = dataSource === 'api' ? apiError : null;
+  const currentClasses = useApiData ? transformedApiClasses : classes;
+  const isLoading = useApiData ? apiLoading : false;
+  const hasError = useApiData ? apiError : null;
 
   const filteredClasses = currentClasses.filter(cls => {
-    return cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           cls.subject.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         cls.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         cls.teacher.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSubject = filterSubject === 'all' || cls.subject === filterSubject;
+    return matchesSearch && matchesSubject;
   });
 
-  const getTeacherName = (teacherId) => {
-    if (teacherId.startsWith('api-teacher-')) {
-      return `API Teacher ${teacherId.split('-')[2]}`;
-    }
-    const teacher = teachers.find(t => t.id === teacherId);
-    return teacher ? teacher.name : 'Not Assigned';
-  };
-
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div>
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Classes</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage class schedules and assignments</p>
+          <p className="text-gray-600 dark:text-gray-400">Manage class schedules and information</p>
         </div>
         <Button onClick={() => setShowForm(true)} variant="primary">
           Create New Class
@@ -144,38 +192,45 @@ const Classes = () => {
               Choose between local data and API data from JSONPlaceholder
             </p>
           </div>
-          <div className="flex space-x-2">
-            <Button
-              onClick={() => setDataSource('local')}
-              variant={dataSource === 'local' ? 'primary' : 'secondary'}
-              size="sm"
-            >
-              Local Data ({classes.length})
-            </Button>
-            <Button
-              onClick={() => setDataSource('api')}
-              variant={dataSource === 'api' ? 'primary' : 'secondary'}
-              size="sm"
-            >
-              API Data ({transformedApiClasses.length})
-            </Button>
-          </div>
+          <ToggleSwitch
+            checked={useApiData}
+            onChange={setUseApiData}
+            leftLabel="Local"
+            rightLabel="API"
+          />
         </div>
       </Card>
 
-      {/* Search */}
+      {/* Search and Filter */}
       <Card className="p-6 mb-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Search Classes
-          </label>
-          <input
-            type="text"
-            placeholder="Search by class name or subject..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Search Classes
+            </label>
+            <input
+              type="text"
+              placeholder="Search by name, subject, or teacher..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Filter by Subject
+            </label>
+            <select
+              value={filterSubject}
+              onChange={(e) => setFilterSubject(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="all">All Subjects</option>
+              {subjects.map(subject => (
+                <option key={subject} value={subject}>{subject}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </Card>
 
@@ -194,7 +249,7 @@ const Classes = () => {
               {hasError}
             </p>
             <Button 
-              onClick={() => setDataSource('local')} 
+              onClick={() => setUseApiData(false)} 
               variant="primary"
             >
               Switch to Local Data
@@ -204,7 +259,7 @@ const Classes = () => {
       )}
 
       {/* Add/Edit Form */}
-      {showForm && dataSource === 'local' && (
+      {showForm && !useApiData && (
         <Card className="p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             {editingClass ? 'Edit Class' : 'Create New Class'}
@@ -219,7 +274,7 @@ const Classes = () => {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
             <div>
@@ -230,7 +285,7 @@ const Classes = () => {
                 required
                 value={formData.subject}
                 onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
               >
                 <option value="">Select Subject</option>
                 {subjects.map(subject => (
@@ -242,61 +297,36 @@ const Classes = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Teacher *
               </label>
-              <select
+              <input
+                type="text"
                 required
-                value={formData.teacherId}
-                onChange={(e) => setFormData({...formData, teacherId: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-              >
-                <option value="">Select Teacher</option>
-                {teachers.map(teacher => (
-                  <option key={teacher.id} value={teacher.id}>
-                    {teacher.name} - {teacher.subject}
-                  </option>
-                ))}
-              </select>
+                value={formData.teacher}
+                onChange={(e) => setFormData({...formData, teacher: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Grade *
+                Schedule
               </label>
-              <select
-                required
-                value={formData.grade}
-                onChange={(e) => setFormData({...formData, grade: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-              >
-                <option value="">Select Grade</option>
-                {grades.map(grade => (
-                  <option key={grade} value={grade}>Grade {grade}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Schedule *
-              </label>
-              <select
-                required
+              <input
+                type="text"
                 value={formData.schedule}
                 onChange={(e) => setFormData({...formData, schedule: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-              >
-                <option value="">Select Time Slot</option>
-                {timeSlots.map(slot => (
-                  <option key={slot} value={slot}>{slot}</option>
-                ))}
-              </select>
+                placeholder="e.g., Mon/Wed/Fri 9:00 AM"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Room Number
+                Room
               </label>
               <input
                 type="text"
                 value={formData.room}
                 onChange={(e) => setFormData({...formData, room: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                placeholder="e.g., Room 101"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
             <div>
@@ -307,7 +337,8 @@ const Classes = () => {
                 type="number"
                 value={formData.capacity}
                 onChange={(e) => setFormData({...formData, capacity: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                placeholder="e.g., 25"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
             <div className="md:col-span-2">
@@ -318,7 +349,8 @@ const Classes = () => {
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
                 rows="3"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                placeholder="Enter class description..."
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
             <div className="md:col-span-2 flex space-x-4">
@@ -334,8 +366,7 @@ const Classes = () => {
                   setFormData({
                     name: '',
                     subject: '',
-                    teacherId: '',
-                    grade: '',
+                    teacher: '',
                     schedule: '',
                     room: '',
                     capacity: '',
@@ -353,64 +384,58 @@ const Classes = () => {
       {/* Classes Grid */}
       <Card className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-          Classes ({filteredClasses.length}) - {dataSource === 'api' ? 'API Data' : 'Local Data'}
+          Classes ({filteredClasses.length}) - {useApiData ? 'API Data' : 'Local Data'}
         </h2>
         {filteredClasses.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredClasses.map((cls) => (
               <div key={cls.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:shadow-md transition-shadow">
-                <div className="flex justify-between items-start mb-3">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                    <span className="text-purple-600 font-semibold">
+                      {cls.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
+                    <h3 className="font-medium text-gray-900 dark:text-white text-sm line-clamp-2">
                       {cls.name}
                     </h3>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                      {cls.subject}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    {cls.isApiData && (
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                        API
-                      </span>
-                    )}
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                      G{cls.grade}
-                    </span>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">{cls.subject}</p>
                   </div>
                 </div>
                 
-                <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex justify-between">
                     <span className="font-medium">Teacher:</span>
-                    <span className="text-right">{getTeacherName(cls.teacherId)}</span>
+                    <span className="text-xs">{cls.teacher}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="font-medium">Schedule:</span>
-                    <span className="text-right text-xs">{cls.schedule}</span>
-                  </div>
+                  {cls.schedule && (
+                    <div className="flex justify-between">
+                      <span className="font-medium">Schedule:</span>
+                      <span className="text-xs">{cls.schedule}</span>
+                    </div>
+                  )}
                   {cls.room && (
                     <div className="flex justify-between">
                       <span className="font-medium">Room:</span>
-                      <span className="text-right">{cls.room}</span>
+                      <span className="text-xs">{cls.room}</span>
                     </div>
                   )}
                   {cls.capacity && (
                     <div className="flex justify-between">
                       <span className="font-medium">Capacity:</span>
-                      <span className="text-right">{cls.capacity}</span>
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                        {cls.capacity}
+                      </span>
+                    </div>
+                  )}
+                  {cls.description && (
+                    <div>
+                      <span className="font-medium">Description:</span>
+                      <p className="text-xs mt-1 line-clamp-3">{cls.description}</p>
                     </div>
                   )}
                 </div>
-                
-                {cls.description && (
-                  <div className="mt-3">
-                    <span className="font-medium text-xs">Description:</span>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-3">
-                      {cls.description}
-                    </p>
-                  </div>
-                )}
                 
                 {!cls.isApiData && (
                   <div className="mt-3 flex space-x-2">

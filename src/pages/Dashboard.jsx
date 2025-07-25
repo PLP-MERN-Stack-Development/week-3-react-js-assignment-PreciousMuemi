@@ -1,13 +1,31 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Card from '../components/Card';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useApi } from '../hooks/useApi';
+
+const ToggleSwitch = ({ checked, onChange, leftLabel, rightLabel }) => (
+  <div className="flex items-center space-x-2">
+    <span className="text-sm text-gray-700 dark:text-gray-300">{leftLabel}</span>
+    <button
+      type="button"
+      className={`relative inline-flex h-6 w-12 border-2 border-transparent rounded-full cursor-pointer transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${checked ? 'bg-blue-600' : 'bg-gray-300'}`}
+      aria-pressed={checked}
+      onClick={() => onChange(!checked)}
+    >
+      <span
+        className={`inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition-transform duration-200 ${checked ? 'translate-x-6' : 'translate-x-1'}`}
+      />
+    </button>
+    <span className="text-sm text-gray-700 dark:text-gray-300">{rightLabel}</span>
+  </div>
+);
 
 const Dashboard = () => {
   const [students] = useLocalStorage('students', []);
   const [teachers] = useLocalStorage('teachers', []);
   const [classes] = useLocalStorage('classes', []);
   const [attendance] = useLocalStorage('attendance', []);
+  const [useApiData, setUseApiData] = useState(false);
 
   // Fetch API data
   const { data: apiStudents, loading: studentsLoading } = useApi('https://jsonplaceholder.typicode.com/users');
@@ -51,7 +69,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div>
+    <div className="space-y-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Dashboard
@@ -61,8 +79,28 @@ const Dashboard = () => {
         </p>
       </div>
 
+      {/* Data Source Toggle */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Data Source
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Choose between local data and API data from JSONPlaceholder
+            </p>
+          </div>
+          <ToggleSwitch
+            checked={useApiData}
+            onChange={setUseApiData}
+            leftLabel="Local"
+            rightLabel="API"
+          />
+        </div>
+      </Card>
+
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
           <Card key={index} className="p-6">
             <div className="flex items-center">
@@ -101,7 +139,7 @@ const Dashboard = () => {
       </Card>
 
       {/* API Data Grid */}
-      <div className="mt-8">
+      <div className="space-y-6">
         <Card className="p-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             API Students Data
@@ -136,10 +174,8 @@ const Dashboard = () => {
             </div>
           )}
         </Card>
-      </div>
 
-      {/* Courses Grid */}
-      <div className="mt-6">
+        {/* Courses Grid */}
         <Card className="p-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             Courses
