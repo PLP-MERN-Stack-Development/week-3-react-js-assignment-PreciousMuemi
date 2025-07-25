@@ -10,7 +10,6 @@ import Students from './pages/Students';
 import Teachers from './pages/Teachers';
 import Classes from './pages/Classes';
 import Attendance from './pages/Attendance';
-
 import './App.css';
 
 function App() {
@@ -19,11 +18,11 @@ function App() {
   return (
     <ThemeProvider>
       <Router>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        <div className="h-screen w-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col">
           <Navbar onMenuClick={() => setSidebarOpen(true)} />
-          <div className="flex">
+          <div className="flex flex-1 h-0 min-h-0">
             <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-            <main className="flex-1 lg:ml-64">
+            <main className="flex-1 w-full h-full min-h-0 min-w-0 overflow-auto">
               <ErrorBoundary>
                 <Routes>
                   <Route path="/" element={<Dashboard />} />

@@ -350,68 +350,74 @@ const Classes = () => {
         </Card>
       )}
 
-      {/* Classes List */}
+      {/* Classes Grid */}
       <Card className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Classes ({filteredClasses.length}) - {dataSource === 'api' ? 'API Data' : 'Local Data'}
         </h2>
         {filteredClasses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredClasses.map((cls) => (
-              <Card key={cls.id} className="p-6 hover:shadow-lg transition-shadow">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <div key={cls.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
                       {cls.name}
-                      {cls.isApiData && (
-                        <span className="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                          API
-                        </span>
-                      )}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                       {cls.subject}
                     </p>
                   </div>
-                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                    Grade {cls.grade}
-                  </span>
+                  <div className="flex items-center space-x-1">
+                    {cls.isApiData && (
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        API
+                      </span>
+                    )}
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                      G{cls.grade}
+                    </span>
+                  </div>
                 </div>
                 
-                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <div className="flex items-center">
+                <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
+                  <div className="flex justify-between">
                     <span className="font-medium">Teacher:</span>
-                    <span className="ml-2">{getTeacherName(cls.teacherId)}</span>
+                    <span className="text-right">{getTeacherName(cls.teacherId)}</span>
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex justify-between">
                     <span className="font-medium">Schedule:</span>
-                    <span className="ml-2">{cls.schedule}</span>
+                    <span className="text-right text-xs">{cls.schedule}</span>
                   </div>
                   {cls.room && (
-                    <div className="flex items-center">
+                    <div className="flex justify-between">
                       <span className="font-medium">Room:</span>
-                      <span className="ml-2">{cls.room}</span>
+                      <span className="text-right">{cls.room}</span>
                     </div>
                   )}
                   {cls.capacity && (
-                    <div className="flex items-center">
+                    <div className="flex justify-between">
                       <span className="font-medium">Capacity:</span>
-                      <span className="ml-2">{cls.capacity} students</span>
+                      <span className="text-right">{cls.capacity}</span>
                     </div>
                   )}
                 </div>
                 
                 {cls.description && (
-                  <p className="mt-3 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
-                    {cls.description}
-                  </p>
+                  <div className="mt-3">
+                    <span className="font-medium text-xs">Description:</span>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-3">
+                      {cls.description}
+                    </p>
+                  </div>
                 )}
                 
                 {!cls.isApiData && (
-                  <div className="mt-4 flex space-x-2">
+                  <div className="mt-3 flex space-x-2">
                     <Button
                       onClick={() => handleEdit(cls)}
                       variant="secondary"
+                      size="sm"
                       className="text-xs px-2 py-1"
                     >
                       Edit
@@ -419,6 +425,7 @@ const Classes = () => {
                     <Button
                       onClick={() => handleDelete(cls.id)}
                       variant="danger"
+                      size="sm"
                       className="text-xs px-2 py-1"
                     >
                       Delete
@@ -426,11 +433,11 @@ const Classes = () => {
                   </div>
                 )}
                 {cls.isApiData && (
-                  <div className="mt-4">
+                  <div className="mt-3">
                     <span className="text-gray-400 text-xs">Read-only</span>
                   </div>
                 )}
-              </Card>
+              </div>
             ))}
           </div>
         ) : (

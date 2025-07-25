@@ -14,12 +14,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { path: '/attendance', label: 'Attendance' },
   ];
 
-  const quickStats = [
-    { label: 'Total Students', value: '150+', color: 'text-blue-600' },
-    { label: 'Active Teachers', value: '25+', color: 'text-green-600' },
-    { label: 'Classes Running', value: '12', color: 'text-purple-600' },
-    { label: 'Attendance Rate', value: '95%', color: 'text-orange-600' },
-  ];
+
 
   return (
     <>
@@ -74,24 +69,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               ))}
             </div>
 
-            {/* Quick Stats */}
-            <div className="mt-8">
-              <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
-                Quick Stats
-              </h3>
-              <div className="space-y-3">
-                {quickStats.map((stat, index) => (
-                  <div key={index} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {stat.label}
-                    </div>
-                    <div className={`text-lg font-semibold ${stat.color}`}>
-                      {stat.value}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+
 
             {/* Theme Toggle */}
             <div className="mt-8">

@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
 import Card from '../components/Card';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useApi } from '../hooks/useApi';
 
 const Dashboard = () => {
   const [students] = useLocalStorage('students', []);
   const [teachers] = useLocalStorage('teachers', []);
   const [classes] = useLocalStorage('classes', []);
   const [attendance] = useLocalStorage('attendance', []);
+
+  // Fetch API data
+  const { data: apiStudents, loading: studentsLoading } = useApi('https://jsonplaceholder.typicode.com/users');
+  const { data: apiPosts, loading: postsLoading } = useApi('https://jsonplaceholder.typicode.com/posts');
 
   const stats = [
     {
@@ -28,7 +33,7 @@ const Dashboard = () => {
       bgColor: 'bg-purple-100 dark:bg-purple-900/20'
     },
     {
-      title: 'Today\'s Attendance',
+      title: "Today's Attendance",
       value: attendance.filter(a => {
         const today = new Date().toDateString();
         return new Date(a.date).toDateString() === today;
@@ -46,7 +51,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Dashboard
@@ -62,7 +67,7 @@ const Dashboard = () => {
           <Card key={index} className="p-6">
             <div className="flex items-center">
               <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                <span className="text-2xl">{stat.icon}</span>
+                <span className="text-2xl">&nbsp;</span>
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -95,55 +100,72 @@ const Dashboard = () => {
         </div>
       </Card>
 
-      {/* Recent Activity */}
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* API Data Grid */}
+      <div className="mt-8">
         <Card className="p-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Recent Students
+            API Students Data
           </h2>
-          {students.slice(0, 5).length > 0 ? (
-            <div className="space-y-3">
-              {students.slice(0, 5).map((student, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                    <span className="text-blue-600 font-semibold">
-                      {student.name.charAt(0).toUpperCase()}
-                    </span>
+          {studentsLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">Loading students...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {apiStudents?.slice(0, 12).map((student) => (
+                <div key={student.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="flex items-center space-x-3 mb-3">
+                    <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 font-semibold text-sm">
+                        {student.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-white text-sm">{student.name}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">{student.email}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">{student.name}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Grade {student.grade}</p>
+                  <div className="space-y-1 text-xs text-gray-600 dark:text-gray-400">
+                    <p><span className="font-medium">Phone:</span> {student.phone}</p>
+                    <p><span className="font-medium">Website:</span> {student.website}</p>
+                    <p><span className="font-medium">Company:</span> {student.company.name}</p>
                   </div>
                 </div>
               ))}
             </div>
-          ) : (
-            <p className="text-gray-500 dark:text-gray-400">No students added yet.</p>
           )}
         </Card>
+      </div>
 
+      {/* API Posts Grid */}
+      <div className="mt-6">
         <Card className="p-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Recent Teachers
+            API Posts Data
           </h2>
-          {teachers.slice(0, 5).length > 0 ? (
-            <div className="space-y-3">
-              {teachers.slice(0, 5).map((teacher, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                    <span className="text-green-600 font-semibold">
-                      {teacher.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">{teacher.name}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{teacher.subject}</p>
+          {postsLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">Loading posts...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {apiPosts?.slice(0, 12).map((post) => (
+                <div key={post.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <h3 className="font-medium text-gray-900 dark:text-white text-sm mb-2 line-clamp-2">
+                    {post.title}
+                  </h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-3 mb-3">
+                    {post.body}
+                  </p>
+                  <div className="text-xs text-gray-500 dark:text-gray-500">
+                    <p><span className="font-medium">User ID:</span> {post.userId}</p>
+                    <p><span className="font-medium">Post ID:</span> {post.id}</p>
                   </div>
                 </div>
               ))}
             </div>
-          ) : (
-            <p className="text-gray-500 dark:text-gray-400">No teachers added yet.</p>
           )}
         </Card>
       </div>

@@ -99,7 +99,7 @@ const Students = () => {
   });
 
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div>
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Students</h1>
@@ -304,90 +304,90 @@ const Students = () => {
         </Card>
       )}
 
-      {/* Students List */}
+      {/* Students Grid */}
       <Card className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Students ({filteredStudents.length}) - {dataSource === 'api' ? 'API Data' : 'Local Data'}
         </h2>
         {filteredStudents.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Student
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Grade
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Contact
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredStudents.map((student) => (
-                  <tr key={student.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                          <span className="text-blue-600 font-semibold">
-                            {student.name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">
-                            {student.name}
-                            {student.isApiData && (
-                              <span className="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                API
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {student.email}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                        Grade {student.grade}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {student.phone || 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      {!student.isApiData && (
-                        <div className="flex space-x-2">
-                          <Button
-                            onClick={() => handleEdit(student)}
-                            variant="secondary"
-                            className="text-xs px-2 py-1"
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            onClick={() => handleDelete(student.id)}
-                            variant="danger"
-                            className="text-xs px-2 py-1"
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredStudents.map((student) => (
+              <div key={student.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:shadow-md transition-shadow">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 font-semibold">
+                      {student.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center">
+                      <p className="font-medium text-gray-900 dark:text-white text-sm">
+                        {student.name}
+                      </p>
                       {student.isApiData && (
-                        <span className="text-gray-400 text-xs">Read-only</span>
+                        <span className="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                          API
+                        </span>
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">{student.email}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex justify-between">
+                    <span className="font-medium">Grade:</span>
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      {student.grade}
+                    </span>
+                  </div>
+                  {student.age && (
+                    <div className="flex justify-between">
+                      <span className="font-medium">Age:</span>
+                      <span>{student.age}</span>
+                    </div>
+                  )}
+                  {student.phone && (
+                    <div className="flex justify-between">
+                      <span className="font-medium">Phone:</span>
+                      <span className="text-xs">{student.phone}</span>
+                    </div>
+                  )}
+                  {student.address && (
+                    <div>
+                      <span className="font-medium">Address:</span>
+                      <p className="text-xs mt-1">{student.address}</p>
+                    </div>
+                  )}
+                </div>
+                
+                {!student.isApiData && (
+                  <div className="mt-3 flex space-x-2">
+                    <Button
+                      onClick={() => handleEdit(student)}
+                      variant="secondary"
+                      size="sm"
+                      className="text-xs px-2 py-1"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      onClick={() => handleDelete(student.id)}
+                      variant="danger"
+                      size="sm"
+                      className="text-xs px-2 py-1"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                )}
+                {student.isApiData && (
+                  <div className="mt-3">
+                    <span className="text-gray-400 text-xs">Read-only</span>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         ) : (
           <div className="text-center py-8">
